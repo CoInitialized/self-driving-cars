@@ -7,19 +7,23 @@ import sys
 
 os.environ["SDL_VIDEO_CENTERED"] = "1"
 
-screen = pygame.display.set_mode((600, 600))
+screen = pygame.display.set_mode((1600, 1000))
 pygame.display.set_caption("LEVEL 2 = Find the Correct Square!")
 
 clock = pygame.time.Clock()
 
+
+
 class Player(object):
     def __init__(self):
-        self.rect = pygame.draw.rect(screen, (0, 0, 128), (10,20,30,40))
+        self.img = pygame.image.load('self-driving-cars/car.png').convert()
         self.dist = 10
         self.last_key = (K_RIGHT,False)
         self.exit = False
         self.ticks = 60
         self.clock = pygame.time.Clock()
+        self.position = (0,0)
+        self.angle = 0
 
 
 
@@ -32,30 +36,38 @@ class Player(object):
                     self.exit = True
             pressed = pygame.key.get_pressed()
             if pressed[pygame.K_LEFT]:
-                self.draw_rect(-1, 0)
-            elif pressed[pygame.K_RIGHT]:
-                self.draw_rect(1, 0)
-            elif pressed[pygame.K_UP]:
-                self.draw_rect(0, -1)
-            elif pressed[pygame.K_DOWN]:
-                self.draw_rect(0, 1)
-            elif pressed == K_ESCAPE:
+                self.angle -=1
+                self.draw_rect(self.position)
+            if pressed[pygame.K_RIGHT]:
+                self.angle += 1
+                self.draw_rect(self.position)
+            if pressed[pygame.K_UP]:
+                self.position = (self.position[0] +1, self.position[1] + math.sin(self.angle/255))
+                self.draw_rect(self.position)
+            if pressed[pygame.K_DOWN]:
+                self.position = (self.position[0] + -1, self.position[1] + math.sin(self.angle/255))
+                self.draw_rect(self.position)
+            if pressed == K_ESCAPE:
                 pygame.quit(); exit()
             self.clock.tick(self.ticks)
 
-    def draw_rect(self,x,y):
-        screen.fill((255, 255, 255))
-        self.rect = self.rect.move(x*self.dist, y*self.dist); pygame.draw.rect(screen, (0, 0, 128), self.rect)
+    def draw_rect(self,pos):
+        screen.fill((0, 0, 0))
+        rect = self.img.get_rect()
+        rect.center = pos
+        screen.blit(self.img, rect)
         pygame.display.update()
 
     def draw(self, surface):
-        pygame.draw.rect(screen, (0, 0, 128), (10,20,30,40))
+        rect = self.img.get_rect()
+        rect.center = (0, 0)
+        screen.blit(self.img, rect)
 
 pygame.init()
 
 player = Player()
 #clock = pygame.time.Clock()
-screen.fill((255, 255, 255))
+screen.fill((0, 0, 0))
 player.draw(screen)
 pygame.display.update()
 
